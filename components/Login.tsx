@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { BrainCircuit, GraduationCap, UserCheck, AlertCircle, ArrowRight, ShieldCheck, Star, Mail } from 'lucide-react';
+import { BrainCircuit, GraduationCap, UserCheck, AlertCircle, ArrowRight, ShieldCheck, Star, Mail, CheckCircle2 } from 'lucide-react';
 import { User, UserRole } from '../types';
 
 interface LoginProps {
@@ -13,10 +13,11 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [lastName, setLastName] = useState('');
   const [role, setRole] = useState<UserRole>('ETUDIANT');
   const [error, setError] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const ADMIN_EMAIL = "mzeinebou@gmail.com";
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -45,6 +46,9 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       return;
     }
 
+    // Déclencher l'animation de succès
+    setIsLoggingIn(true);
+
     // Si c'est l'admin, on force le rôle Professeur (Admis)
     const finalRole = isAdmin ? 'PROFESSEUR' : role;
     
@@ -53,11 +57,14 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       ? "Administrateur Zeinebou" 
       : `${trimmedFirstName.charAt(0).toUpperCase() + trimmedFirstName.slice(1)} ${trimmedLastName.toUpperCase()}`;
     
-    onLogin({
-      email: trimmedEmail,
-      role: finalRole,
-      name: fullName
-    });
+    // Petit délai pour laisser l'utilisateur voir l'animation de succès
+    setTimeout(() => {
+      onLogin({
+        email: trimmedEmail,
+        role: finalRole,
+        name: fullName
+      });
+    }, 800);
   };
 
   const isEnteringAdmin = email.trim().toLowerCase() === ADMIN_EMAIL;
@@ -84,6 +91,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               <div className="flex bg-gray-100 p-1.5 rounded-2xl">
                 <button
                   type="button"
+                  disabled={isLoggingIn}
                   onClick={() => setRole('ETUDIANT')}
                   className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black transition-all ${role === 'ETUDIANT' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
                 >
@@ -92,6 +100,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 </button>
                 <button
                   type="button"
+                  disabled={isLoggingIn}
                   onClick={() => setRole('PROFESSEUR')}
                   className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black transition-all ${role === 'PROFESSEUR' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
                 >
@@ -109,10 +118,11 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 <input
                   type="text"
                   required
+                  disabled={isLoggingIn}
                   placeholder="Ahmed"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full px-4 py-3.5 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white transition-all text-sm font-medium placeholder:text-gray-300"
+                  className="w-full px-4 py-3.5 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white transition-all text-sm font-medium placeholder:text-gray-300 disabled:opacity-50"
                 />
               </div>
               <div className="space-y-2">
@@ -120,10 +130,11 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 <input
                   type="text"
                   required
+                  disabled={isLoggingIn}
                   placeholder="Vall"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className="w-full px-4 py-3.5 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white transition-all text-sm font-medium placeholder:text-gray-300"
+                  className="w-full px-4 py-3.5 rounded-2xl bg-gray-50 border-2 border-transparent focus:border-blue-500 focus:bg-white transition-all text-sm font-medium placeholder:text-gray-300 disabled:opacity-50"
                 />
               </div>
             </div>
@@ -141,10 +152,11 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               <input
                 type="email"
                 required
+                disabled={isLoggingIn}
                 placeholder="votre.email@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className={`w-full px-5 py-4 rounded-2xl bg-gray-50 border-2 border-transparent transition-all text-sm font-medium placeholder:text-gray-300 ${isEnteringAdmin ? 'focus:border-indigo-500 focus:bg-white ring-2 ring-indigo-50' : isGmail ? 'focus:border-teal-500 focus:bg-white' : 'focus:border-blue-500 focus:bg-white'}`}
+                className={`w-full px-5 py-4 rounded-2xl bg-gray-50 border-2 border-transparent transition-all text-sm font-medium placeholder:text-gray-300 disabled:opacity-50 ${isEnteringAdmin ? 'focus:border-indigo-500 focus:bg-white ring-2 ring-indigo-50' : isGmail ? 'focus:border-teal-500 focus:bg-white' : 'focus:border-blue-500 focus:bg-white'}`}
               />
             </div>
 
@@ -157,10 +169,20 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
             <button
               type="submit"
-              className={`w-full py-5 text-white rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-xl transition-all active:scale-95 group ${isEnteringAdmin ? 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-200' : isGmail ? 'bg-teal-600 hover:bg-teal-700 shadow-teal-200' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-200'}`}
+              disabled={isLoggingIn}
+              className={`w-full py-5 text-white rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-xl transition-all active:scale-95 group relative overflow-hidden ${isEnteringAdmin ? 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-200' : isGmail ? 'bg-teal-600 hover:bg-teal-700 shadow-teal-200' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-200'} ${isLoggingIn ? 'scale-105' : ''}`}
             >
-              Continuer vers l'espace {isEnteringAdmin ? 'Administrateur' : role.toLowerCase()}
-              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              {isLoggingIn ? (
+                <div className="flex items-center gap-2 animate-in zoom-in duration-300">
+                  <CheckCircle2 size={22} className="text-white animate-bounce" />
+                  <span>Connexion réussie !</span>
+                </div>
+              ) : (
+                <>
+                  <span>Continuer vers l'espace {isEnteringAdmin ? 'Administrateur' : role.toLowerCase()}</span>
+                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
             </button>
           </form>
 
