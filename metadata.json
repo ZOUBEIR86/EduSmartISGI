@@ -1,0 +1,7 @@
+{
+  "name": "Copy of EduSmart IA",
+  "description": "Une plateforme éducative intelligente pour générer des quiz personnalisés et corriger des copies d'élèves avec un feedback pédagogique précis.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
